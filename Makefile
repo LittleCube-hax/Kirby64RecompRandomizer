@@ -16,11 +16,16 @@ endif
 TARGET  := $(BUILD_DIR)/mod.elf
 
 LDSCRIPT := mod.ld
-CFLAGS   := -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
+DECOMP := k64-decomp
+LIBULTRA_INC := $(DECOMP)/libreultra/include/2.0I
+DECOMP_INCS := -I $(LIBULTRA_INC) -I $(LIBULTRA_INC)/PR -I $(DECOMP)/include -I $(DECOMP)/include/libc -I $(DECOMP)/src.old -I $(DECOMP)/src -I $(DECOMP)/assets
+
+
+CFLAGS   := $(DECOMP_INCS) -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
 			-fomit-frame-pointer -ffast-math -fno-unsafe-math-optimizations -fno-builtin-memset \
-			-Wall -Wextra -Wno-incompatible-library-redeclaration -Wno-unused-parameter -Wno-unknown-pragmas -Wno-unused-variable \
-			-Wno-missing-braces -Wno-unsupported-floating-point-opt -Werror=section
-CPPFLAGS := -nostdinc -D_LANGUAGE_C -DMIPS -DF3DEX_GBI_2 -DF3DEX_GBI_PL -DGBI_DOWHILE -I include include/libc
+			-Wall -Wextra -Wno-incompatible-library-redeclaration -Wno-unused-parameter -Wno-unknown-pragmas \
+			-Wno-unused-variable -Wno-missing-braces -Wno-unsupported-floating-point-opt -Wno-visibility
+CPPFLAGS := -nostdinc -Wno-incompatible-function-pointer-types -D__sgi -D_LANGUAGE_C -DTARGET_N64 -DMIPS -I include -I dummy_headers $(DECOMP_INCS)
 LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map=$(BUILD_DIR)/mod.map --warn-unresolved-symbols --emit-relocs -e 0 --no-nmagic
 
 C_SRCS := $(wildcard src/*.c)
@@ -37,12 +42,14 @@ else
 	mkdir -p $@
 endif
 
-$(C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIR) $(BUILD_DIR)/src
+$(C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIR) $(BUILD_DIR)/src $(BUILD_DIR)/output
 	$(CC) $(CFLAGS) $(CPPFLAGS) $< -MMD -MF $(@:.o=.d) -c -o $@
 
-all: $(TARGET)
+all: $(BUILD_DIR)/output/mod_binary.bin
+
+$(BUILD_DIR)/output/mod_binary.bin: $(TARGET) mod.toml
 	RecompModTool.exe mod.toml $(BUILD_DIR)/output
-	echo "Done."
+	@echo "Done."
 
 clean:
 	rm -rf $(BUILD_DIR)

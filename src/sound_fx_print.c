@@ -1,10 +1,7 @@
 #include "modding.h"
 #include "recomputils.h"
 #include "recompconfig.h"
-#include "types.h"
-#include "libc/stddef.h"
-#include "libc/stdbool.h"
-#include "libc/stdint.h"
+#include "ultratypes.h"
 
 // Print every currently played sound effect to console.
 RECOMP_HOOK("play_sound") void on_play_sound(s32 sound) {
