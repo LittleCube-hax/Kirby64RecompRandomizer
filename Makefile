@@ -26,7 +26,7 @@ CFLAGS   := $(DECOMP_INCS) -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -m
 			-Wall -Wextra -Wno-incompatible-library-redeclaration -Wno-unused-parameter -Wno-unknown-pragmas \
 			-Wno-unused-variable -Wno-missing-braces -Wno-unsupported-floating-point-opt -Wno-visibility
 CPPFLAGS := -nostdinc -Wno-incompatible-function-pointer-types -D__sgi -D_LANGUAGE_C -DTARGET_N64 -DMIPS -I include -I dummy_headers $(DECOMP_INCS)
-LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map=$(BUILD_DIR)/mod.map --warn-unresolved-symbols --emit-relocs -e 0 --no-nmagic
+LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map=$(BUILD_DIR)/mod.map --unresolved-symbols=ignore-all --emit-relocs -e 0 --no-nmagic
 
 C_SRCS := $(wildcard src/*.c)
 C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.o))
